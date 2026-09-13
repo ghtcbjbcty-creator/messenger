@@ -1,4 +1,4 @@
-name: Build APK (Kivy/Buildozer)
+name: Build APK
 
 on:
   push:
@@ -11,19 +11,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Этот экшен ставит всё нужное для Kivy/Buildozer: JDK, Android SDK, NDK, инструменты
-      - name: Setup Kivy Build Environment
-        uses: kivy/buildozer-action@v1
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: '3.11'
-          android-api: '31'
-          android-ndk: '25b'
-
-      - name: Build APK
-        run: buildozer -v android debug
+          command: echo y | buildozer android debug
+          buildozer_version: stable
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: messenger-apk
-          path: bin/*.apk
+          path: ${{ steps.buildozer.outputs.filename }}
